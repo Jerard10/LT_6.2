@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learning Task 6.2 - Animated Billiard SVG</title>
+  <style>
+    /* Center the 300x300 SVG cleanly on a dark background */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #111827;
+      font-family: 'Inter', Arial, Helvetica, sans-serif;
+    }
+
+    /* Container styling for the 300x300 SVG canvas */
+    svg {
+      border-radius: 16px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      display: block;
+    }
+
+    /* Cue stick pull-back and strike animation (angled 15deg down-right) */
+    .cue-stick {
+      animation: cueStrike 3s ease-in-out infinite;
+    }
+
+    /* Impact flash burst at the moment of contact */
+    .impact-spark {
+      transform-origin: 132px 158px;
+      animation: sparkBurst 3s ease-out infinite;
+    }
+
+    /* 8-ball slides forward after being struck by the cue stick */
+    .billiard-ball-group {
+      animation: ballRollSlide 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    }
+
+    /* Number 8 face rotates forward as the ball rolls */
+    .eight-face {
+      transform-origin: 175px 168px;
+      animation: ballSpin 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    }
+
+    /* Keyframes for cue stick aiming and striking */
+    @keyframes cueStrike {
+      0%, 10% {
+        transform: translate(0px, 0px);
+        opacity: 1;
+      }
+      /* Pull back to aim */
+      32% {
+        transform: translate(-34px, -9px);
+        opacity: 1;
+      }
+      /* Fast forward strike into the 8-ball */
+      42% {
+        transform: translate(18px, 5px);
+        opacity: 1;
+      }
+      /* Hold briefly after follow-through */
+      55% {
+        transform: translate(12px, 3px);
+        opacity: 1;
+      }
+      /* Fade out while resetting for next loop */
+      75%, 88% {
+        transform: translate(-15px, -4px);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(0px, 0px);
+        opacity: 1;
+      }
+    }
+
+    /* Keyframes for impact flash at t = 42% */
+    @keyframes sparkBurst {
+      0%, 40% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      43% {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+      55%, 100% {
+        transform: scale(1.6);
+        opacity: 0;
+      }
+    }
+
+    /* Keyframes for 8-ball rolling forward and resetting cleanly */
+    @keyframes ballRollSlide {
+      0%, 41% {
+        transform: translate(0px, 0px);
+        opacity: 1;
+      }
+      /* Roll forward to the right after impact */
+      72% {
+        transform: translate(78px, 21px);
+        opacity: 1;
+      }
+      /* Fade out at the edge before looping back */
+      82% {
+        transform: translate(86px, 23px);
+        opacity: 0;
+      }
+      88% {
+        transform: translate(0px, 0px);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(0px, 0px);
+        opacity: 1;
+      }
+    }
+
+    /* Keyframes for the 8-ball number face rolling forward */
+    @keyframes ballSpin {
+      0%, 41% {
+        transform: rotate(0deg);
+      }
+      72%, 85% {
+        transform: rotate(150deg);
+      }
+      88%, 100% {
+        transform: rotate(0deg);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Exact 300 x 300 SVG Canvas -->
+  <svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- 3D Glossy Shading for the Black 8-Ball -->
+      <radialGradient id="ballGradient" cx="35%" cy="30%" r="65%">
+        <stop offset="0%" stop-color="#4b5563" />
+        <stop offset="45%" stop-color="#111827" />
+        <stop offset="100%" stop-color="#030712" />
+      </radialGradient>
+
+      <!-- Clip path to keep animations cleanly inside the green felt -->
+      <clipPath id="feltClip">
+        <rect x="16" y="16" width="268" height="268" rx="10" />
+      </clipPath>
+    </defs>
+
+    <!-- Pool Table Wooden Frame -->
+    <rect width="300" height="300" fill="#5c3a21" />
+
+    <!-- Green Pool Table Felt -->
+    <rect x="16" y="16" width="268" height="268" rx="10" fill="#15803d" stroke="#14532d" stroke-width="4" />
+
+    <!-- All moving table elements clipped inside the felt boundary -->
+    <g clip-path="url(#feltClip)">
+      <!-- Subtle Pool Table Head String / Shot Guide Line -->
+      <line x1="20" y1="128" x2="280" y2="198" stroke="#22c55e" stroke-width="2" stroke-dasharray="6 6" opacity="0.4" />
+
+      <!-- Animated Billiard 8-Ball + Ground Shadow Group -->
+      <g class="billiard-ball-group">
+        <!-- Soft Ground Shadow underneath the 8-Ball -->
+        <ellipse cx="175" cy="212" rx="38" ry="10" fill="#052e16" opacity="0.55" />
+
+        <!-- Main Black 8-Ball Sphere (radius 42) -->
+        <circle cx="175" cy="170" r="42" fill="url(#ballGradient)" />
+
+        <!-- Glossy Top-Left Light Highlight -->
+        <ellipse cx="158" cy="147" rx="11" ry="6" transform="rotate(-30 158 147)" fill="#ffffff" opacity="0.25" />
+
+        <!-- Rotating White Number Circle + "8" -->
+        <g class="eight-face">
+          <circle cx="175" cy="168" r="17" fill="#f8fafc" />
+          <text
+            x="175"
+            y="175"
+            text-anchor="middle"
+            font-family="Arial, Helvetica, sans-serif"
+            font-size="20"
+            font-weight="bold"
+            fill="#0f172a"
+          >8</text>
+        </g>
+      </g>
+
+      <!-- Impact Spark / Contact Flash at Point of Contact -->
+      <g class="impact-spark">
+        <circle cx="132" cy="158" r="7" fill="#fef08a" />
+        <line x1="122" y1="146" x2="114" y2="138" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round" />
+        <line x1="120" y1="168" x2="110" y2="174" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round" />
+        <line x1="134" y1="143" x2="136" y2="132" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+      </g>
+
+      <!-- Animated Wooden Billiard Cue Stick (Angled 15deg toward the 8-ball) -->
+      <g class="cue-stick">
+        <g transform="translate(115, 154) rotate(15)">
+          <!-- Dark Wood Butt (Rear Handle) -->
+          <polygon points="-155,-6.5 -65,-4.8 -65,4.8 -155,6.5" fill="#451a03" />
+          <!-- Decorative Gold Ring Accent -->
+          <rect x="-67" y="-4.8" width="4" height="9.6" fill="#eab308" />
+          <!-- Light Maple Wood Shaft -->
+          <polygon points="-63,-4.7 -8,-3.2 -8,3.2 -63,4.7" fill="#f3d5a5" />
+          <!-- White Ferrule Collar -->
+          <rect x="-8" y="-3.2" width="6" height="6.4" fill="#f8fafc" />
+          <!-- Blue Chalked Leather Cue Tip -->
+          <path d="M-2,-3.2 L1,-3.2 C3,-3.2 3,3.2 1,3.2 L-2,3.2 Z" fill="#2563eb" />
+        </g>
+      </g>
+    </g>
+
+    <!-- Crisp Inner Frame Border Overlay -->
+    <rect x="16" y="16" width="268" height="268" rx="10" fill="none" stroke="#14532d" stroke-width="4" />
+  </svg>
+
+</body>
+</html>
